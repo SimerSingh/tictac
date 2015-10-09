@@ -1,0 +1,261 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, 
+    user-scalable=no, initial-scale=1, maximum-scale=1, user-scalable=0" />
+<meta name="apple-mobile-web-app-capable" content="yes" />  
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+<style type="text/css">
+body { margin: 0; padding: 0; background: #000;}
+canvas { display: block; margin: 0 auto; background: #fff; }
+</style>
+
+
+  <head>  
+  <title>A canvas moveto example</title>
+  <script src="jquery.js"></script>
+  <script src="Player.js"></script>
+  <script src="game.js"></script>
+
+  <script>
+  	var POP = { 
+	  	WIDTH: 320, 
+	    HEIGHT:  480, 
+	    // we'll set the rest of these
+	    // in the init function
+	    RATIO:  null,
+	    currentWidth:  null,
+	    currentHeight:  null,
+	    canvas: null,
+	    ctx:  null,
+
+	    init: function(){
+	    	//The proportion of width to height
+	    	POP.RATIO = POP.WIDTH / POP.HEIGHT;
+	    	//These will change when the screen will be resized
+	    	POP.currentWidth = POP.WIDTH;
+	    	POP.currentHeight = POP.HEIGHT;
+	    	//This is out canvas element
+	    	POP.canvas = document.getElementById('t_canvas');
+	    	
+	    	//setting this is important otherwise the browser 
+	    	POP.canvas.width = POP.WIDTH;
+	    	POP.canvas.height = POP.HEIGHT;
+	    	//The canvas context enables us to 	interact with the canvas api
+	    	POP.ctx = POP.canvas.getContext('2d');
+
+	    	//ready to resize	    	
+	    	/*TODO*/
+	    },
+
+	    resize: function(){
+	    	POP.currentHeight = window.innerHeight;
+	    	//resize the width in the propotion to the new height
+	    	POP.currentWidth = POP.currentHeight * POP.RATIO;
+
+	    	//This will allow some extra space on the page,allowing us to scroll pass the address bar,Thus hiding it
+	    	if(POP.android || POP.ios){
+	    		document.body.style.height = (window.innerHeight + 50) + 'px';
+	    	}
+
+	    	POP.canvas.style.width = POP.currentHeight + 'px';
+	    	POP.canvas.style.height = POP.currentWidth + 'px';
+
+	    	window.setTimeout(function(){
+	    		window.scrollTo(0,1);
+	    	},1);
+
+	    }
+	};
+		window.addEventListener('load',POP.init,false);
+		window.addEventListener('resize',POP.resize,false);
+
+
+  </script
+
+
+  </head>
+	<body>    
+	<canvas id="t_canvas" name = "canvas" style="border:1px solid #000000;"></canvas>
+	<br/>
+	<button id="drawButton">Play Tic Tac</button>
+	
+	
+  </body>
+  	<script>	
+	
+	
+	var x=50;
+	var y=50;
+	var w = 150; //width
+	var h = 100; //height
+	var columns=3;
+	var rows =3;
+	var vnp =w/columns; //vertical next point
+	var hnp=h/rows;  //horizontal next point
+	var canvas  = document.getElementById("t_canvas");
+	var ctx = canvas.getContext("2d");
+	var clickCount=1;
+	 var imageObj = new Image();
+	
+	var fixx =0;
+	var fixy =0;
+	
+	var clickthree =0;
+	
+	//var socket = io(); //initialize socket
+	
+	var arr = [[0,0],[0, 1],[0, 2],
+				[1,0],[1,1],[1,2],
+				 [2,0],[2,1],[2,2]];
+
+	
+	function createMatrix(){
+		 ctx.clearRect(50, 50, 150, 100);	
+		 ctx.clearRect(0, 0, 300,50);
+         ctx.beginPath();		 
+		 drawVerticalLines(parseFloat(vnp));
+		 drawHorizontalLines(parseFloat(hnp));
+		 ctx.fillStyle = "#FF0000";
+		 ctx.strokeRect(x, y, w, h);
+		 ctx.closePath()
+		 ctx.stroke();
+	}	 
+		
+	$('#drawButton').click(function(){
+		createMatrix();
+	})
+
+function drawVerticalLines(np){
+        var np = x + np //start point of first column 
+        while(np < w+x){
+            ctx.moveTo(np, y);
+            ctx.lineTo(np, y+h);
+            np = vnp + np;
+        }
+ 
+    }
+ 
+ function drawHorizontalLines(np){
+        var np = y + np //start point of first column
+        while(np < h+y){
+            ctx.moveTo(x, np);
+            ctx.lineTo(x+w, np);
+            np = hnp + np;
+        }
+    }
+ 
+ function getMousePos(canvas, evt) {
+	
+     var rect = canvas.getBoundingClientRect();
+     return {
+       x: evt.clientX - rect.left,
+       y: evt.clientY - rect.top
+     };
+   }
+ 
+ function writeMessage(canvas, message) { 
+	 
+	 ctx.clearRect(0, 0, 300,50);
+	 ctx.font = '18pt Calibri';
+	 ctx.fillStyle = 'black';
+	 ctx.fillText(message, 10, 25);
+	
+   }
+ 
+ canvas.addEventListener('click', function(evt) {
+     var mousePos = getMousePos(canvas, evt),         // get adjusted mouse position
+         gw = vnp * 0.5,                              // get center of one cell for x cordinates
+         gh = hnp * 0.5,							  // get center of one cell for y cordinates
+         ix = ((mousePos.x - x) / vnp)|0,             // get cell index clicked
+         iy = ((mousePos.y - y) / hnp)|0,
+         cx = ix * vnp + x + gw,                       // scale up to get pixel pos
+         cy = iy * hnp + y + gh;
+		 //alert(null != arr[ix][iy] && arr[ix][iy] != 0);
+	 
+	if((mousePos.x >=50 && mousePos.x<=200) && (mousePos.y >=50 && mousePos.y<=150)){
+	
+    // demo point showing position    
+    //ctx.fillRect(cx - 2, cy - 2, 4, 4);
+	
+	if(arr[ix][iy] != 'cs' && arr[ix][iy] != 'cc'){	
+		//alert('adding');
+		console.log('adding');
+		drawImage(cx-13,cy-13,ix,iy);
+		
+	}else{
+	 console.log("arr-"+arr[ix][iy]);
+	  console.log('Already Added');
+	}
+	}
+	
+
+}, false);
+ 
+ function drawImage(x,y,ix,iy){
+	
+     imageObj.onload = function() {
+    	 ctx.drawImage(imageObj, x, y);
+		  if(result == 1){
+			alert('won');
+			//ctx.clearRect(50, 50, 150, 100);
+			clearArray();
+		}
+     };
+	 
+	 var result = 0;
+	// alert(clickCount);
+	 if(clickCount%2 == 0){
+		imageObj.src = 'circ.png';
+		arr[ix][iy]="cc";
+		result = checkWinner("cc");
+	 }else{
+		arr[ix][iy]="cs";
+		imageObj.src = 'cross.png';
+		result = checkWinner("cs");
+	 }
+	
+	 
+	 clickCount++;
+	 
+	 count = 1;
+	 console.log(arr[0][0] == arr[0][1] == arr[0][2]);
+ }
+ 
+ function checkWinner(sign){
+   // alert(arr[0][0] + "-" + arr[1][0] +"-" + arr[2][2]);
+   if(arr[0][0] == sign && arr[0][1] == sign && arr[0][2] == sign){
+		return 1;
+   }else if(arr[1][0] == sign && arr[1][1] == sign && arr[1][2] == sign){
+		return 1;
+   }else if(arr[2][0] == sign && arr[2][1] == sign && arr[2][2] == sign){
+		return 1;
+   }else if(arr[0][0] == sign && arr[1][0] == sign && arr[2][0] == sign){
+		return 1;
+   }else if(arr[0][1] == sign && arr[1][1] == sign && arr[2][1] == sign){
+		return 1;
+   }else if(arr[0][2] == sign && arr[1][2] == sign && arr[2][2] == sign){
+		return 1;
+   }else if(arr[0][0] == sign && arr[1][1] == sign && arr[2][2] == sign){
+		return 1;
+   }else if(arr[0][2] == sign && arr[1][1] == sign && arr[2][0] == sign){
+		return 1;
+   }
+
+ }
+
+function clearArray(){
+	for(i=0;i<3;i++){
+	    for(j=0;j<3;j++){
+		  arr[i][j] = 0;
+		}		
+	} 
+}
+
+ </script>
+
+
+
+</html>
